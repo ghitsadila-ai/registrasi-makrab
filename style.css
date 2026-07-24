@@ -33,3 +33,22 @@ h1 {
     font-size: 18px;
     font-weight: bold;
 }
+#status{
+    text-align:center;
+    margin-top:20px;
+}
+
+#status h1{
+    font-size:42px;
+}
+
+#status h2{
+    font-size:28px;
+}
+
+#nextScan{
+    margin-top:20px;
+    padding:15px 30px;
+    font-size:18px;
+    cursor:pointer;
+}
