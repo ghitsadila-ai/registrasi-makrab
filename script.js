@@ -1,138 +1,96 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxBZLpmD9sp_nr9gtzFS5FwWGEw6e3PUIP_UdKynKQn_2cmsgaLYlRMLYP2F49w8_bH/exec";
 
+const html5QrCode = new Html5Qrcode("reader");
 
-let html5QrcodeScanner = new Html5QrcodeScanner(
-    "reader",
-    {
-        fps: 10,
-        qrbox: 250
-    }
-);
+function startScanner() {
 
+    html5QrCode.start(
+        { facingMode: "environment" },
+        {
+            fps: 20,
+            qrbox: { width: 250, height: 250 }
+        },
 
+        (decodedText) => {
 
-function onScanSuccess(decodedText, decodedResult) {
+            // Stop kamera
+            html5QrCode.stop();
 
+            document.getElementById("reader").style.display = "none";
 
-    document.getElementById("status").innerHTML =
-        "⏳ Mengecek tiket...";
+            document.getElementById("status").innerHTML =
+                "<h2>⏳ Mengecek tiket...</h2>";
 
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    ticket: decodedText
+                })
+            })
 
-    html5QrcodeScanner.pause();
+            .then(res => res.json())
 
+            .then(data => {
 
+                if(data.status == "success"){
 
-    fetch(WEB_APP_URL, {
+                    document.getElementById("status").innerHTML = `
+                        <h1 style="color:green;">✅ BERHASIL</h1>
+                        <h2>${data.nama}</h2>
+                        <h2>Meja ${data.meja}</h2>
+                    `;
 
-        method: "POST",
+                }
 
-        body: JSON.stringify({
+                else if(data.status == "used"){
 
-            ticket: decodedText
+                    document.getElementById("status").innerHTML = `
+                        <h1 style="color:orange;">⚠️ SUDAH CHECK-IN</h1>
+                        <h2>${data.nama}</h2>
+                    `;
 
-        })
+                }
 
-    })
+                else{
 
+                    document.getElementById("status").innerHTML = `
+                        <h1 style="color:red;">❌ TIKET TIDAK DITEMUKAN</h1>
+                    `;
 
-    .then(res => res.json())
+                }
 
+                document.getElementById("nextScan").style.display = "block";
 
-    .then(data => {
+            })
 
+            .catch(error => {
 
-        if(data.status == "success"){
+                console.error(error);
 
+                document.getElementById("status").innerHTML =
+                    "<h2>❌ Gagal koneksi server</h2>";
 
-            document.getElementById("status").innerHTML = `
+                document.getElementById("nextScan").style.display = "block";
 
-                <h2>✅ Berhasil</h2>
-
-                <p>${data.nama}</p>
-
-                <p>Meja ${data.meja}</p>
-
-            `;
-
-
-        }
-
-
-        else if(data.status == "used"){
-
-
-            document.getElementById("status").innerHTML = `
-
-                <h2>⚠️ Sudah Check-in</h2>
-
-                <p>${data.nama}</p>
-
-            `;
-
-
-        }
-
-
-        else{
-
-
-            document.getElementById("status").innerHTML = `
-
-                <h2>❌ Tiket tidak ditemukan</h2>
-
-            `;
-
+            });
 
         }
 
-
-        document.getElementById("nextScan").style.display = "block";
-
-
-    })
-
-
-
-    .catch(error => {
-
-
-        console.error(error);
-
-
-        document.getElementById("status").innerHTML =
-
-        "❌ Gagal koneksi server";
-
-
-        document.getElementById("nextScan").style.display = "block";
-
-
-    });
-
-
+    );
 
 }
 
-
-
-html5QrcodeScanner.render(onScanSuccess);
-
-
-
-
+startScanner();
 
 document.getElementById("nextScan").onclick = function(){
 
+    document.getElementById("reader").style.display = "block";
 
     document.getElementById("status").innerHTML =
-
-    "Silakan scan tiket";
-
+        "Silakan scan tiket";
 
     document.getElementById("nextScan").style.display = "none";
 
-
-    html5QrcodeScanner.resume();
-
+    startScanner();
 
 };
