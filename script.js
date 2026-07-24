@@ -1,4 +1,4 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzwq5HZNNGmaRxlB_OprAgPUECBzlyECXAdQ08vlFIST2gjqcFzQbFJaBcxMNTWiqM7Zg/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxBZLpmD9sp_nr9gtzFS5FwWGEw6e3PUIP_UdKynKQn_2cmsgaLYlRMLYP2F49w8_bH/exec";
 
 
 let html5QrcodeScanner = new Html5QrcodeScanner(
